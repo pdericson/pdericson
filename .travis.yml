@@ -8,7 +8,7 @@ before_deploy:
 
 deploy:
 - provider: script
-  script: "set -x; ssh -o BatchMode=yes -o StrictHostKeyChecking=no -o User=deploy pdericson.com mkdir -p bin && scp -o BatchMode=yes -o StrictHostKeyChecking=no -o User=deploy pdericson pdericson.com:bin/"
+  script: sh .travis/deploy.sh
   skip_cleanup: true
   on:
     branch: master
