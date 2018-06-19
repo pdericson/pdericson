@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -12,6 +13,12 @@ import (
 
 	"github.com/pdericson/pdericson/pkg/ping"
 )
+
+var Version string
+
+func VersionHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "%s\n", Version)
+}
 
 func main() {
 	lb := littleboss.New("pdericson")
@@ -25,6 +32,7 @@ func httpMain(ctx context.Context, ln net.Listener) {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/ping", ping.PingHandler)
+	r.HandleFunc("/version", VersionHandler)
 
 	srv := &http.Server{
 		ReadTimeout:  10 * time.Second,

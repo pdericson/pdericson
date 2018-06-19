@@ -3,7 +3,7 @@ go:
   - "1.10.x"
 
 before_deploy:
-  - GOOS=openbsd GOARCH=amd64 go build -o pdericson github.com/pdericson/pdericson/cmd/pdericson
+  - GOOS=openbsd GOARCH=amd64 go build -ldflags "-X main.Version=$TRAVIS_COMMIT" -o pdericson github.com/pdericson/pdericson/cmd/pdericson
   - openssl aes-256-cbc -K $encrypted_88142569f400_key -iv $encrypted_88142569f400_iv -in .travis/id_rsa.enc -out ~/.ssh/id_rsa -d && chmod 600 ~/.ssh/id_rsa
 
 deploy:
