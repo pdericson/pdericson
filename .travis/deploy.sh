@@ -7,5 +7,7 @@ ssh -o BatchMode=yes -o StrictHostKeyChecking=no -o User=deploy pdericson.com mk
 scp -o BatchMode=yes -o StrictHostKeyChecking=no -o User=deploy pdericson pdericson.com:bin/pdericson-$TRAVIS_COMMIT
 ssh -o BatchMode=yes -o StrictHostKeyChecking=no -o User=deploy pdericson.com ln -fs pdericson-$TRAVIS_COMMIT bin/pdericson
 
-# nohup bin/pdericson -littleboss=start &
+echo
+echo "nohup bin/pdericson -littleboss=start &"
+echo
 ssh -o BatchMode=yes -o StrictHostKeyChecking=no -o User=deploy pdericson.com bin/pdericson-$TRAVIS_COMMIT -littleboss=reload
