@@ -17,6 +17,9 @@ import (
 var Version string
 
 func VersionHandler(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
 	fmt.Fprintf(w, "%s\n", Version)
 }
 
