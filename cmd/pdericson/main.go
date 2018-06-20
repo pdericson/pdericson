@@ -22,7 +22,7 @@ func VersionHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	lb := littleboss.New("pdericson")
-	flagHTTP := lb.Listener("http", "tcp", ":8080", "address")
+	flagHTTP := lb.Listener("http", "tcp", "127.0.0.1:8080", "address")
 	lb.Run(func(ctx context.Context) {
 		httpMain(ctx, flagHTTP.Listener())
 	})
