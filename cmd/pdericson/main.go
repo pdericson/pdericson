@@ -1,3 +1,6 @@
+// pdericson
+//
+// swagger:meta
 package main
 
 import (
@@ -9,19 +12,27 @@ import (
 	"time"
 
 	"crawshaw.io/littleboss"
+	"github.com/gobuffalo/packr"
 	"github.com/gorilla/mux"
 
 	"github.com/pdericson/pdericson/pkg/count"
 	"github.com/pdericson/pdericson/pkg/ping"
 )
 
-var Version string
+var version string
 
+// swagger:route GET /version main VersionHandler
+//
+// Responses:
+//   200:
+//
+// Produces:
+// - text/plain
 func VersionHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	fmt.Fprintf(w, "%s\n", Version)
+	fmt.Fprintf(w, "%s\n", version)
 }
 
 func main() {
@@ -35,10 +46,13 @@ func main() {
 func httpMain(ctx context.Context, ln net.Listener) {
 	r := mux.NewRouter()
 
-	r.HandleFunc("/count", count.Handler).Methods("POST")
-	r.HandleFunc("/count/{name}", count.Handler).Methods("GET")
+	r.HandleFunc("/count", count.PostHandler).Methods("POST")
+	r.HandleFunc("/count/{name}", count.GetHandler).Methods("GET")
 	r.HandleFunc("/ping", ping.PingHandler)
 	r.HandleFunc("/version", VersionHandler)
+
+	box := packr.NewBox("./static")
+	r.PathPrefix("/").Handler(http.FileServer(box))
 
 	srv := &http.Server{
 		ReadTimeout:  10 * time.Second,
