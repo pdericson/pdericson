@@ -28,10 +28,22 @@ func worker() {
 	}
 	defer db.Close()
 
+	sqlStmt := `
+        create table if not exists count(
+            date text not null,
+            name text not null
+        );
+        `
+
+	_, err = db.Exec(sqlStmt)
+	if err != nil {
+		log.Fatalf("count: worker: %s\n", err.Error())
+	}
+
 	for {
 		count := <-c
 
-		stmt, err := db.Prepare(`insert into count(date, name) values(date('now'), ?)`)
+		stmt, err := db.Prepare(`insert into count(date, name) values(now(), $1)`)
 		if err != nil {
 			log.Fatalf("count: worker: %s\n", err.Error())
 		}
@@ -65,26 +77,6 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 		c = make(chan Count)
 
 		go worker()
-	}
-
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	defer db.Close()
-
-	sqlStmt := `
-        create table if not exists count(
-            date text not null,
-            name text not null
-        );
-        `
-
-	_, err = db.Exec(sqlStmt)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
 	}
 
 	w.Header().Set("Access-Control-Allow-Origin", "*")
