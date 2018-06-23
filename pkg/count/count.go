@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
@@ -16,11 +15,10 @@ const (
 )
 
 type Count struct {
-	Name  string    `json:"name"`
-	Count int       `json:"count"`
-	First time.Time `json:"first"`
-	Last  time.Time `json:"last"`
-	Age   float64   `json:"age"`
+	Name  string `json:"name"`
+	Count int    `json:"count"`
+	First string `json:"first"`
+	Last  string `json:"last"`
 }
 
 var c chan Count
@@ -195,9 +193,6 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-
-	// age
-	count.Age = count.Last.Sub(count.First).Hours() / 24
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(count)
