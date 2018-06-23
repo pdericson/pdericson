@@ -131,8 +131,8 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 
 	sqlStmt := `
         create table if not exists count(
-            date text not null,
-            name text not null
+            date timestamp not null,
+            name text      not null
         );
         `
 
