@@ -7,7 +7,11 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
+)
+
+const (
+	connStr = "user=pdericson password=pdericson dbname=pdericson sslmode=disable"
 )
 
 type Count struct {
@@ -18,7 +22,7 @@ type Count struct {
 var c chan Count
 
 func worker() {
-	db, err := sql.Open("sqlite3", "./count.db")
+	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatalf("count: worker: %s\n", err.Error())
 	}
@@ -63,7 +67,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 		go worker()
 	}
 
-	db, err := sql.Open("sqlite3", "./count.db")
+	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -79,7 +83,8 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 
 	_, err = db.Exec(sqlStmt)
 	if err != nil {
-		log.Fatalf("count: worker: %s\n", err.Error())
+		http.Error(w, err.Error(), 500)
+		return
 	}
 
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -125,7 +130,7 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 		go worker()
 	}
 
-	db, err := sql.Open("sqlite3", "./count.db")
+	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -141,14 +146,15 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 
 	_, err = db.Exec(sqlStmt)
 	if err != nil {
-		log.Fatalf("count: worker: %s\n", err.Error())
+		http.Error(w, err.Error(), 500)
+		return
 	}
 
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	count.Name = vars["name"]
 
-	stmt, err := db.Prepare(`select count(*) from count where name=?`)
+	stmt, err := db.Prepare(`select count(*) from count where name=$1`)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
