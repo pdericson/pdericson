@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
@@ -15,8 +16,11 @@ const (
 )
 
 type Count struct {
-	Name  string `json:"name"`
-	Count int    `json:"count"`
+	Name  string    `json:"name"`
+	Count int       `json:"count"`
+	First time.Time `json:"first"`
+	Last  time.Time `json:"last"`
+	Age   float64   `json:"age"`
 }
 
 var c chan Count
@@ -146,6 +150,7 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 
 	count.Name = vars["name"]
 
+	// count
 	stmt, err := db.Prepare(`select count(*) from count where name=$1`)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -158,6 +163,41 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
+
+	// first
+	stmt, err = db.Prepare(`select date from count where name=$1 order by date asc limit 1`)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	defer stmt.Close()
+
+	err = stmt.QueryRow(count.Name).Scan(&count.First)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+	}
+
+	// last
+	stmt, err = db.Prepare(`select date from count where name=$1 order by date desc limit 1`)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	defer stmt.Close()
+
+	err = stmt.QueryRow(count.Name).Scan(&count.Last)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+	}
+
+	// age
+	count.Age = count.Last.Sub(count.First).Hours() / 24
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(count)
