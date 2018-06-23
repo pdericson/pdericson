@@ -81,7 +81,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	err = json.NewDecoder(r.Body).Decode(&count)
+	err := json.NewDecoder(r.Body).Decode(&count)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
