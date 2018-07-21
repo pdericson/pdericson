@@ -15,7 +15,6 @@ import (
 	"github.com/gobuffalo/packr"
 	"github.com/gorilla/mux"
 
-	"github.com/pdericson/pdericson/pkg/count"
 	"github.com/pdericson/pdericson/pkg/ping"
 )
 
@@ -46,8 +45,6 @@ func main() {
 func httpMain(ctx context.Context, ln net.Listener) {
 	r := mux.NewRouter()
 
-	r.HandleFunc("/count", count.PostHandler).Methods("POST")
-	r.HandleFunc("/count/{name}", count.GetHandler).Methods("GET")
 	r.HandleFunc("/ping", ping.PingHandler)
 	r.HandleFunc("/version", VersionHandler)
 
