@@ -7,6 +7,8 @@ import (
 
 // swagger:route GET /ping ping PingHandler
 //
+// Ping.
+//
 // Responses:
 //   200:
 //

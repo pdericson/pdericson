@@ -1,5 +1,7 @@
 // pdericson
 //
+// pdericson.
+//
 // swagger:meta
 package main
 
@@ -21,6 +23,8 @@ import (
 var version string
 
 // swagger:route GET /version main VersionHandler
+//
+// Version.
 //
 // Responses:
 //   200:
