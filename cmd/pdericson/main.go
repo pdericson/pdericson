@@ -49,11 +49,11 @@ func main() {
 func httpMain(ctx context.Context, ln net.Listener) {
 	r := mux.NewRouter()
 
-	r.HandleFunc("/ping", ping.PingHandler)
-	r.HandleFunc("/version", VersionHandler)
+	r.HandleFunc("/api/ping", ping.PingHandler)
+	r.HandleFunc("/api/version", VersionHandler)
 
 	box := packr.NewBox("./static")
-	r.PathPrefix("/").Handler(http.FileServer(box))
+	r.PathPrefix("/api/").Handler(http.FileServer(box))
 
 	srv := &http.Server{
 		ReadTimeout:  10 * time.Second,
